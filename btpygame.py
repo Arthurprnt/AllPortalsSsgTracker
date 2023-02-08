@@ -10,6 +10,28 @@ class pygameimage():
     def gethitbox(self):
         return (self.pos[0], self.pos[0] + self.size[0], self.pos[1], self.pos[1] + self.size[1])
 
+class pygamebutton():
+    def __init__(self, image, image_t, pos):
+        assert image.get_size() == image_t.get_size()
+        self.away = pygameimage(image, pos)
+        self.target = pygameimage(image_t, pos)
+        self.pos = pos
+        self.size = image.get_size()
+
+    def display(self, screen):
+        if not collide(self.away, pygame.mouse.get_pos()):
+            screen.blit(self.away.image, self.away.pos)
+        else:
+            screen.blit(self.target.image, self.target.pos)
+
+    def gethitbox(self):
+        return (self.pos[0], self.pos[0] + self.size[0], self.pos[1], self.pos[1] + self.size[1])
+
+    def setpos(self, newpos):
+        self.pos = newpos
+        self.target.pos = newpos
+        self.away.pos = newpos
+
 def collide(image, mouse):
     """
     Check if the mouse cursor collide with an image.
