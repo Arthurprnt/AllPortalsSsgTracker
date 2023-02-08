@@ -1,5 +1,5 @@
 import pygame
-from func import opencsv, updateoverlay
+from func import opencsv, updateoverlay, updateenv
 from btpygame import pygameimage, collide, showtext
 
 pygame.init()
@@ -24,6 +24,7 @@ data = opencsv("assets/route.csv")
 running = True
 isusedasovere = False
 insettings = False
+waitinginput = (False, None)
 
 nb_portal = 1
 btn_add = {
@@ -48,7 +49,7 @@ btn_set = {
 }
 
 txt_height = showtext(screen, "test", "assets/Montserrat-Bold.ttf", 30, (20, 20), (255, 255, 255), "topleft")[1]
-size = (txt_height*2.56, txt_height)
+size = (txt_height, txt_height)
 btn_change1 = {
     "away": pygameimage(pygame.transform.scale(pygame.image.load("assets/change.png"), size), (0, 0)),
     "target": pygameimage(pygame.transform.scale(pygame.image.load("assets/change_t.png"), size), (0, 0))
@@ -61,10 +62,6 @@ btn_change3 = {
     "away": pygameimage(pygame.transform.scale(pygame.image.load("assets/change.png"), size), (0, 0)),
     "target": pygameimage(pygame.transform.scale(pygame.image.load("assets/change_t.png"), size), (0, 0))
 }
-btn_change4 = {
-    "away": pygameimage(pygame.transform.scale(pygame.image.load("assets/change.png"), size), (0, 0)),
-    "target": pygameimage(pygame.transform.scale(pygame.image.load("assets/change_t.png"), size), (0, 0))
-}
 background = pygameimage(pygame.image.load("assets/background.png"), (0, -150))
 cross = pygameimage(pygame.transform.scale(pygame.image.load("assets/not.png"), (80, 80)), (942, 230))
 
@@ -73,7 +70,7 @@ while running:
     if not isusedasovere:
         screen.blit(background.image, background.pos)
     else:
-        hexc = env["BACKGROUND_COLOR"].replace("#", "")
+        hexc = "#0015ff".replace("#", "")
         screen.fill(tuple(int(hexc[i:i+2], 16) for i in (0, 2, 4)))
 
     if not collide(btn_set["away"], pygame.mouse.get_pos()):
@@ -115,10 +112,9 @@ while running:
             showtext(screen, f"Note: {data[nb_portal][5]}", "assets/Montserrat-Bold.ttf", 30, (20, 180), (255, 255, 255), "topleft")
     else:
         showtext(screen, "Settings:", "assets/Montserrat-Bold.ttf", 30, (20, 20), (255, 255, 255), "topleft")
-        next_len = showtext(screen, f"   Next portal: {env['NEXT_PORTAL']}", "assets/Montserrat-Bold.ttf", 30, (20, 60), (255, 255, 255), "topleft")
-        prev_len = showtext(screen, f"   Previous portal: {env['PREV_PORTAL']}", "assets/Montserrat-Bold.ttf", 30, (20, 100), (255, 255, 255), "topleft")
-        reset_len = showtext(screen, f"   Reset advancement: {env['RESET_ADV']}", "assets/Montserrat-Bold.ttf", 30, (20, 140), (255, 255, 255), "topleft")
-        background_len = showtext(screen, f"   Background color: {env['BACKGROUND_COLOR']}", "assets/Montserrat-Bold.ttf", 30, (20, 180), (255, 255, 255), "topleft")
+        next_len = showtext(screen, f"   Next portal: {pygame.key.name(int(env['NEXT_PORTAL']))}", "assets/Montserrat-Bold.ttf", 30, (20, 60), (255, 255, 255), "topleft")
+        prev_len = showtext(screen, f"   Previous portal: {pygame.key.name(int(env['PREV_PORTAL']))}", "assets/Montserrat-Bold.ttf", 30, (20, 100), (255, 255, 255), "topleft")
+        reset_len = showtext(screen, f"   Reset advancement: {pygame.key.name(int(env['RESET_ADV']))}", "assets/Montserrat-Bold.ttf", 30, (20, 140), (255, 255, 255), "topleft")
         btn_change1["away"].pos = (20+next_len[0]+13, 60)
         btn_change1["target"].pos = (20+next_len[0]+13, 60)
         if not collide(btn_change1["away"], pygame.mouse.get_pos()):
@@ -140,20 +136,20 @@ while running:
         else:
             screen.blit(btn_change3["target"].image, btn_change3["target"].pos)
 
-        btn_change4["away"].pos = (33 + background_len[0], 180)
-        btn_change4["target"].pos = (33 + background_len[0], 180)
-        if not collide(btn_change4["away"], pygame.mouse.get_pos()):
-            screen.blit(btn_change4["away"].image, btn_change4["away"].pos)
-        else:
-            screen.blit(btn_change4["target"].image, btn_change4["target"].pos)
+        if waitinginput[0]:
+            showtext(screen, "Waiting for an input ...", "assets/Montserrat-Bold.ttf", 55, (20, 240), (255, 255, 255), "topleft")
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_u:
-                nb_portal += 1
-                updateoverlay(nb_portal)
+            if waitinginput[0]:
+                if event.key != 27:
+                    env[waitinginput[1]] = event.key
+                else:
+                    env[waitinginput[1]] = 0
+                waitinginput = (False, None)
+                updateenv(env)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == pygame.BUTTON_LEFT:
                 if not insettings:
@@ -170,6 +166,12 @@ while running:
                     insettings = not insettings
                 elif collide(btn_obs["target"], event.pos):
                     isusedasovere = not isusedasovere
+                elif collide(btn_change1["target"], event.pos) and not waitinginput[0]:
+                    waitinginput = (True, "NEXT_PORTAL")
+                elif collide(btn_change2["target"], event.pos) and not waitinginput[0]:
+                    waitinginput = (True, "PREV_PORTAL")
+                elif collide(btn_change3["target"], event.pos) and not waitinginput[0]:
+                    waitinginput = (True, "RESET_ADV")
 
     pygame.display.flip()
     clock.tick(60)
