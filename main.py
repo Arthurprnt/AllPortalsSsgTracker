@@ -1,4 +1,4 @@
-import pygame
+import keyboard, pygame
 from func import opencsv, updateoverlay, updateenv
 from btpygame import pygameimage, collide, showtext
 
@@ -175,5 +175,15 @@ while running:
 
     pygame.display.flip()
     clock.tick(60)
+
+    if keyboard.is_pressed(env["NEXT_PORTAL"]) and nb_portal < 128:
+        nb_portal += 1
+        updateoverlay(nb_portal)
+    elif keyboard.is_pressed(env["PREV_PORTAL"]) and nb_portal > 1:
+        nb_portal -= 1
+        updateoverlay(nb_portal)
+    elif keyboard.is_pressed(env["RESET_ADV"]):
+        nb_portal = 1
+        updateoverlay(nb_portal)
 
 pygame.quit()
