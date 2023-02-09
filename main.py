@@ -25,6 +25,7 @@ running = True
 isusedasovere = False
 insettings = False
 waitinginput = (False, None)
+charge_key = 0
 
 nb_portal = 1
 btn_add = pygamebutton(pygame.transform.scale(pygame.image.load("assets/add.png"), (80, 80)), pygame.transform.scale(pygame.image.load("assets/add_t.png"), (80, 80)), (20, 230))
@@ -119,17 +120,26 @@ while running:
                 elif collide(btn_change3, event.pos) and not waitinginput[0]:
                     waitinginput = (True, "RESET_ADV")
 
+    nextportal = str(pygame.key.name(int(env["NEXT_PORTAL"])))
+    prevportal = str(pygame.key.name(int(env["PREV_PORTAL"])))
+    resetportal = str(pygame.key.name(int(env["RESET_ADV"])))
+
+    if nextportal != "" and keyboard.is_pressed(nextportal) and nb_portal < 128 and charge_key > 10:
+        charge_key = 0
+        nb_portal += 1
+        updateoverlay(nb_portal)
+    elif prevportal != "" and keyboard.is_pressed(prevportal) and nb_portal > 1 and charge_key > 10:
+        charge_key = 0
+        nb_portal -= 1
+        updateoverlay(nb_portal)
+    elif resetportal != "" and keyboard.is_pressed(resetportal) and charge_key > 10:
+        charge_key = 0
+        nb_portal = 1
+        updateoverlay(nb_portal)
+
     pygame.display.flip()
     clock.tick(60)
 
-    if keyboard.is_pressed(env["NEXT_PORTAL"]) and nb_portal < 128:
-        nb_portal += 1
-        updateoverlay(nb_portal)
-    elif keyboard.is_pressed(env["PREV_PORTAL"]) and nb_portal > 1:
-        nb_portal -= 1
-        updateoverlay(nb_portal)
-    elif keyboard.is_pressed(env["RESET_ADV"]):
-        nb_portal = 1
-        updateoverlay(nb_portal)
+    charge_key += 1
 
 pygame.quit()
