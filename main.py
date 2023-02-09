@@ -6,6 +6,7 @@ pygame.init()
 screen = pygame.display.set_mode((1042, 335))
 screen_x, screen_y = screen.get_size()
 pygame.display.set_caption('AllPortalsSsgTracker by DraquoDrass')
+pygame.display.set_icon(pygame.image.load('assets/icon.png'))
 clock = pygame.time.Clock()
 
 env = {}
@@ -39,7 +40,7 @@ size = (txt_height, txt_height)
 btn_change1 = pygamebutton(pygame.transform.scale(pygame.image.load("assets/change.png"), size), pygame.transform.scale(pygame.image.load("assets/change_t.png"), size), (0, 0))
 btn_change2 = pygamebutton(pygame.transform.scale(pygame.image.load("assets/change.png"), size), pygame.transform.scale(pygame.image.load("assets/change_t.png"), size), (0, 0))
 btn_change3 = pygamebutton(pygame.transform.scale(pygame.image.load("assets/change.png"), size), pygame.transform.scale(pygame.image.load("assets/change_t.png"), size), (0, 0))
-background = pygameimage(pygame.image.load("assets/background.png"), (0, -150))
+background = pygameimage(pygame.image.load("assets/background.png"), (0, 0))
 cross = pygameimage(pygame.transform.scale(pygame.image.load("assets/not.png"), (80, 80)), (942, 230))
 
 while running:
@@ -70,7 +71,7 @@ while running:
         if data[nb_portal][5] != "":
             showtext(screen, f"Note: {data[nb_portal][5]}", "assets/Montserrat-Bold.ttf", 30, (20, 180), (255, 255, 255), "topleft")
     else:
-        showtext(screen, "Settings:", "assets/Montserrat-Bold.ttf", 30, (20, 20), (255, 255, 255), "topleft")
+        showtext(screen, "Hotkeys:", "assets/Montserrat-Bold.ttf", 30, (20, 20), (255, 255, 255), "topleft")
         next_len = showtext(screen, f"   Next portal: {pygame.key.name(int(env['NEXT_PORTAL']))}", "assets/Montserrat-Bold.ttf", 30, (20, 60), (255, 255, 255), "topleft")
         prev_len = showtext(screen, f"   Previous portal: {pygame.key.name(int(env['PREV_PORTAL']))}", "assets/Montserrat-Bold.ttf", 30, (20, 100), (255, 255, 255), "topleft")
         reset_len = showtext(screen, f"   Reset advancement: {pygame.key.name(int(env['RESET_ADV']))}", "assets/Montserrat-Bold.ttf", 30, (20, 140), (255, 255, 255), "topleft")
